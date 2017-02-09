@@ -1,4 +1,5 @@
 import sys
+import time
 import json
 import re
 sys.path.append('/p/home/fourmore/python_modules/nltk/gnu/python2.7/lib/python2.7/site-packages/')
@@ -35,8 +36,28 @@ def filter_votes_length(dict_of_subs):
         dict[sub] = [comment for comment in list_of_comments if int(comment["ups"]) >= 2 if len(comment["body"]) >= 20]
     return dict
 
+def split_training_test(dict_of_subs):
+    comment_number = 0
+    training_dict = {}
+    testing_dict = {}
+    for sub, list_of_comments in dict_of_subs.iteritems():
+        for comment in list_of_comments:
+            if (comment_number % 5 == 0): testing_dict.setdefault(sub, []).append(comment)
+            else: training_dict.setdefault(sub, []).append(comment)
+            comment_number +=1 
+    return (training_dict, testing_dict)
+
 if __name__ == "__main__":
-    dict_of_subs = read_JSON_as_dict("smallJSON")
+    print("Starting the timer.")
+    start_time = time.time()
+    dict_of_subs = read_JSON_as_dict("largeJSON")
+    print("It took {0} to read the file.".format(time.time() - start_time))
     dict_of_subs_no_function_words = remove_function_words(dict_of_subs)
+    print("It took {0} to remove function words.".format(time.time() - start_time))
     dict_of_subs_stripped = filter_votes_length(dict_of_subs_no_function_words)
-    print(dict_of_subs_stripped)
+    print("It took {0} to filter votes.".format(time.time() - start_time))
+    training_dict, testing_dict = split_training_test(dict_of_subs_stripped)
+    testing_size = sum(len(comments) for comments in testing_dict)
+    training_size = sum(len(comments) for comments in training_dict)
+    print("Training size: {0}, testing size: {1}.".format(training_size, testing_size))
+    print("total time: {0}.".format(time.time() - start_time))
