@@ -7,6 +7,9 @@ import nltk
 nltk.download('stopwords')
 from nltk.corpus import stopwords
 
+#{sub: third_quartile)}
+dict_of_upvotes = {}
+
 def read_JSON_as_dict(file_name):
     #read the file in as a string and remove non-alphanumeric characters
     dict_of_subs = {}
@@ -42,10 +45,27 @@ def split_training_test(dict_of_subs):
     testing_dict = {}
     for sub, list_of_comments in dict_of_subs.iteritems():
         for comment in list_of_comments:
-            if (comment_number % 5 == 0): testing_dict.setdefault(sub, []).append(comment)
+            if (comment_number % 8 == 0): testing_dict.setdefault(sub, []).append(comment)
             else: training_dict.setdefault(sub, []).append(comment)
-            comment_number +=1 
+            comment_number +=1
+    training_dict = {k: v for k, v in training_dict.items() if v}
+    testing_dict = {k: v for k, v in testing_dict.items() if v}
+    
     return (training_dict, testing_dict)
+
+def determine_if_popular(training_dict):
+    for sub, list_of_comments in training_dict.iteritems():
+        sub_list = []
+        for comment in list_of_comments:
+            sub_list.append(int(comment["ups"]))
+        sorted_list = sorted(sub_list)
+        dict_of_upvotes[sub] = sorted_list[(len(sorted_list)/4)*3]
+    
+    for sub, list_of_comments in training_dict.iteritems():
+        for comment in list_of_comments:
+            if (int(comment["ups"]) >= dict_of_upvotes[sub]): 
+                comment["popular"] = True
+            else: comment["popular"] = False
 
 if __name__ == "__main__":
     print("Starting the timer.")
@@ -55,9 +75,14 @@ if __name__ == "__main__":
     dict_of_subs_no_function_words = remove_function_words(dict_of_subs)
     print("It took {0} to remove function words.".format(time.time() - start_time))
     dict_of_subs_stripped = filter_votes_length(dict_of_subs_no_function_words)
+    dict_reduced = {k: v for k, v in dict_of_subs_stripped.items() if v}
     print("It took {0} to filter votes.".format(time.time() - start_time))
-    training_dict, testing_dict = split_training_test(dict_of_subs_stripped)
-    testing_size = sum(len(comments) for comments in testing_dict)
-    training_size = sum(len(comments) for comments in training_dict)
+    
+    training_dict, testing_dict = split_training_test(dict_reduced)
+    testing_size = sum([len(v) for v in testing_dict.values()])
+    training_size = sum([len(v) for v in training_dict.values()])
     print("Training size: {0}, testing size: {1}.".format(training_size, testing_size))
+    
+    determine_if_popular(training_dict)
+
     print("total time: {0}.".format(time.time() - start_time))
