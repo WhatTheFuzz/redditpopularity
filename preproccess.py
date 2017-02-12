@@ -63,13 +63,14 @@ def determine_if_popular(training_dict):
     print(dict_of_upvotes)
     for sub, list_of_comments in training_dict.iteritems():
         for comment in list_of_comments:
+            comment["body"] = " ".join(comment["body"])
             if (int(comment["ups"]) >= dict_of_upvotes[sub]): 
                 comment["popular"] = True
             else: comment["popular"] = False
     return training_dict
 
 def write_csv(file_name, training_dict):
-    headers = ['ups', 'subreddit', 'popular']
+    headers = ['ups', 'popular', 'subreddit', 'body']
     with open("training.csv", "wb") as file:
         w = csv.DictWriter(file, fieldnames=headers, extrasaction='ignore')
         w.writeheader()
@@ -81,7 +82,7 @@ def write_csv(file_name, training_dict):
 if __name__ == "__main__":
     print("Starting the timer.")
     start_time = time.time()
-    dict_of_subs = read_JSON_as_dict("largeJSON")
+    dict_of_subs = read_JSON_as_dict("tenThousand")
     print("It took {0} to read the file.".format(time.time() - start_time))
     dict_of_subs_no_function_words = remove_function_words(dict_of_subs)
     print("It took {0} to remove function words.".format(time.time() - start_time))
