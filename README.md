@@ -16,10 +16,12 @@ A single comments looks like so:
 ```
 {"gilded":0,"author_flair_text":"Male","author_flair_css_class":"male","retrieved_on":1425124228,"ups":3,"subreddit_id":"t5_2s30g","edited":false,"controversiality":0,"parent_id":"t1_cnapn0k","subreddit":"AskMen","body":"I can't agree with passing the blame, but I'm glad to hear it's at least helping you with the anxiety. I went the other direction and started taking responsibility for everything. I had to realize that people make mistakes including myself and it's gonna be alright. I don't have to be shackled to my mistakes and I don't have to be afraid of making them. ","created_utc":"1420070668","downs":0,"score":3,"author":"TheDukeofEtown","archived":false,"distinguished":null,"id":"cnasd6x","score_hidden":false,"name":"t1_cnasd6x","link_id":"t3_2qyhmp"}
 ```
-
-## Usage
+## Requirements
+- This was tested solely on a 64-bit flavor of SuSE Enterprise Linux. YMMV.
 - Python 2.7.10, or other compatible version.
 - modules: nltk, sklearn, re, json, time, sys, and csv.
+
+## Usage
 - Clone this repository to a folder of your choosing.
 - exectue: ```python preproccess.py dir_to_reddit_comments```, depending on how large the comment file is, this may take a non-trivial amount of time (several hours). This is a one-time process, as it will write the data into another file, which we will then analyze.
 - once complete execute: ```python svm.py```. This will automatically look for the file "training.csv" and preform learn from it, eventually testing it against the test data and producing a result such as: ```Accuracy: 0.67 (+/- 0.07)``` (higher (~1) is better)
