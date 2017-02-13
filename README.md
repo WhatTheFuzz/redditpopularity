@@ -1,4 +1,4 @@
-Determining How Reddit Comments Get Popular
+How to Get Upvotes on Reddit
 ============
 
 ![Team Spark](https://upload.wikimedia.org/wikipedia/en/thumb/8/82/Reddit_logo_and_wordmark.svg/1920px-Reddit_logo_and_wordmark.svg.png)
