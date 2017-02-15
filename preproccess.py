@@ -3,7 +3,7 @@ import sys
 import time
 import json
 import re
-sys.path.append('/p/home/fourmore/python_modules/nltk/gnu/python2.7/lib/python2.7/site-packages/')
+import datetime
 import nltk
 nltk.download('stopwords')
 from nltk.corpus import stopwords
@@ -64,13 +64,14 @@ def determine_if_popular(training_dict):
     for sub, list_of_comments in training_dict.iteritems():
         for comment in list_of_comments:
             comment["body"] = " ".join(comment["body"])
+            comment["created_utc"] = datetime.datetime.fromtimestamp(int(comment["created_utc"])).strftime("%H")
             if (int(comment["ups"]) >= dict_of_upvotes[sub]): 
                 comment["popular"] = True
             else: comment["popular"] = False
     return training_dict
 
 def write_csv(file_name, training_dict):
-    headers = ['ups', 'popular', 'subreddit', 'body']
+    headers = ['ups', 'popular', 'subreddit', 'body', 'controversiality', 'created_utc']
     with open("training.csv", "wb") as file:
         w = csv.DictWriter(file, fieldnames=headers, extrasaction='ignore')
         w.writeheader()
@@ -85,9 +86,12 @@ if __name__ == "__main__":
     dict_of_subs = read_JSON_as_dict("tenThousand")
     print("It took {0} to read the file.".format(time.time() - start_time))
     dict_of_subs_no_function_words = remove_function_words(dict_of_subs)
+    #print("no funct:{0} ".format(dict_of_subs_no_function_words))
     print("It took {0} to remove function words.".format(time.time() - start_time))
     dict_of_subs_stripped = filter_votes_length(dict_of_subs_no_function_words)
+    #print "stripeed: {0}".format(dict_of_subs_stripped)
     dict_reduced = {k: v for k, v in dict_of_subs_stripped.items() if v}
+    #print "reduced: {0}".format(dict_reduced)
     print("It took {0} to filter votes.".format(time.time() - start_time))
     
     training_dict, testing_dict = split_training_test(dict_reduced)
@@ -97,6 +101,6 @@ if __name__ == "__main__":
     
     training_dict_tagged = determine_if_popular(training_dict)
  
-    print(training_dict_tagged)
+    #print(training_dict_tagged)
     write_csv('training.csv', training_dict_tagged)
     print("total time: {0}.".format(time.time() - start_time))

@@ -3,7 +3,7 @@ How to Get Upvotes on Reddit
 
 ![Team Spark](https://upload.wikimedia.org/wikipedia/en/thumb/8/82/Reddit_logo_and_wordmark.svg/1920px-Reddit_logo_and_wordmark.svg.png)
 
-This project seeks to validate the results of previous authors', such as Tracy Rohlin's Master's Thesis for San Jose State in his work, ["Popularity Prediction of Reddit Texts."](http://scholarworks.sjsu.edu/etd_theses/4704/) As there are no courses at West Point dealing with machine learning, this project also introduces me to the field and will serve as my Honor's Theis. 
+This project seeks to validate the results of previous authors' work, such as Tracy Rohlin's Master's Thesis for San Jose State in his work, ["Popularity Prediction of Reddit Texts."](http://scholarworks.sjsu.edu/etd_theses/4704/) As there are no courses at West Point dealing with machine learning, this project also introduces me to the field and will serve as my Honor's Theis. 
 
 ## Objective
 - With the input of any particular Reddit comment, determine if the comment is likely to be popular within that subreddit.
