@@ -23,7 +23,9 @@ A single comments looks like so:
 
 ## Usage
 - Clone this repository to a folder of your choosing.
-- exectue: ```python preproccess.py dir_to_reddit_comments```, depending on how large the comment file is, this may take a non-trivial amount of time (several hours). This is a one-time process, as it will write the data into another file, which we will then analyze.
+- exectue: ```python preprocess.py dir_to_reddit_comments```, depending on how large the comment file is, this may take a non-trivial amount of time (several hours). This is a one-time process, as it will write the data into another file, which we will then analyze.
 - once complete execute: ```python svm.py```. This will automatically look for the file "training.csv" and preform learn from it, eventually testing it against the test data and producing a result such as: ```Accuracy: 0.67 (+/- 0.07)``` (higher (~1) is better)
 
-For information about the author, please visit his website at [www.seandeaton.com](https://www.seandeaton.com).
+## Misc.
+- In the preprocessing step, I opted for readability and compartmentalization over raw speed. Given that this only is run once before writing to a .csv, I felt it was worth the loss in speed. This is why you might notice that I loop through each comment multiple times. 
+- For information about the author, please visit his website at [www.seandeaton.com](https://www.seandeaton.com).
