@@ -16,15 +16,23 @@ if __name__ == "__main__":
     #init our label encoder to turn the subreddit and popular strings/bools into categories
     encoder = preprocessing.LabelEncoder()
     #init our vectorizer, which will transform our strings into a matrix
-    cv = CountVectorizer(binary="true")
+    cv = CountVectorizer()
     list_to_vectorize = (list(set(data.body.tolist())))
     
     #data.subreddit = encoder.fit_transform(data.subreddit)
     #subs = encoder.fit(data.subreddit)
     data.subreddit = encoder.fit_transform(data.subreddit.tolist())
     data.popular = encoder.fit_transform(data.popular.tolist())
+    list_of_body = data.body.as_matrix()
+    bag = cv.fit_transform(list_of_body)
+    data.body = bag
+    '''
+    #np.set_printoptions(threshold='nan')
+    #print bag.toarray()
+    #bag_of_words = cv.fit_transform(data.body)
     #turn into matrix, then a list that the SVC can fit. 
-    data.body = cv.fit_transform(data.body).toarray()
+    #data.body = cv.fit_transform(data.body).toarray()
+    #print data.body.values
     #print("The subreddits are encoded are:\n {0}".format(encoder.inverse_transform(data.subreddit)))
     #print("The texts encoded are:\n {0}".format(np.any(cv.inverse_transform(data.body))))
     
@@ -33,7 +41,7 @@ if __name__ == "__main__":
     print(cv.vocabulary_)
     new_data = cv.transform(["1930s", "heart"])
     print new_data
-    '''
+   
     #columns = features we want to fit. labels = what we want to predict
     columns= ["subreddit", "ups", "controversiality", "created_utc", "body"]
     labels = data["popular"].values
