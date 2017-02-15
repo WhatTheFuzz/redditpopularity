@@ -25,7 +25,10 @@ if __name__ == "__main__":
     data.popular = encoder.fit_transform(data.popular.tolist())
     list_of_body = data.body.as_matrix()
     bag = cv.fit_transform(list_of_body)
-    data.body = bag
+    print bag
+    data.body = bag.toarray()
+    #np.set_printoptions(threshold='nan')
+    #print(data.body)
     '''
     #np.set_printoptions(threshold='nan')
     #print bag.toarray()
@@ -36,16 +39,19 @@ if __name__ == "__main__":
     #print("The subreddits are encoded are:\n {0}".format(encoder.inverse_transform(data.subreddit)))
     #print("The texts encoded are:\n {0}".format(np.any(cv.inverse_transform(data.body))))
     
+    '''
     ''' 
     #ensure our vocab is correct - if we transform additional elements, we should get the number of samples mapped to the feature
     print(cv.vocabulary_)
     new_data = cv.transform(["1930s", "heart"])
     print new_data
-   
+    '''
     #columns = features we want to fit. labels = what we want to predict
-    columns= ["subreddit", "ups", "controversiality", "created_utc", "body"]
+    #columns= ["subreddit", "ups", "controversiality", "created_utc", "body"]
+    columns= ["ups"]
     labels = data["popular"].values
     features = data[list(columns)].values
+    #:features = bag.toarray()
     #print data["body"].values
 
     print "training labels: {0}".format(labels)
