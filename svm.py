@@ -25,11 +25,10 @@ if __name__ == "__main__":
     data.popular = encoder.fit_transform(data.popular.tolist())
     list_of_body = data.body.as_matrix()
     bag = cv.fit_transform(list_of_body)
-    print bag
     data.body = bag.toarray()
     #np.set_printoptions(threshold='nan')
-    #print(data.body)
     '''
+    #print bag
     #np.set_printoptions(threshold='nan')
     #print bag.toarray()
     #bag_of_words = cv.fit_transform(data.body)
@@ -48,22 +47,24 @@ if __name__ == "__main__":
     '''
     #columns = features we want to fit. labels = what we want to predict
     #columns= ["subreddit", "ups", "controversiality", "created_utc", "body"]
-    columns= ["ups"]
+    columns= ["subreddit", "created_utc", "controversiality"]
     labels = data["popular"].values
-    features = data[list(columns)].values
-    #:features = bag.toarray()
-    #print data["body"].values
+    binary_features = data[list(columns)].values
+    wordfreq_features = bag.toarray()
+    final_features = (np.hstack((binary_features, wordfreq_features)))
+    print "\nLabel length is: {0}. Feature length is: {1}".format(len(labels), (len(final_features)))
+    print "The features include: {}".format(columns)
 
-    print "training labels: {0}".format(labels)
-    print "training features: {0}".format(features)
+    #print "training labels: {0}".format(labels)
+    #print "training features: {0}".format(features)
     
     X_train, X_test, y_train, y_test = train_test_split(
-        features, labels, test_size=0.4, random_state=0)
+        final_features, labels, test_size=0.4, random_state=0)
     clf = SVC(kernel='linear', C=1).fit(X_train, y_train)
-    print("partitioning with 60/40 gave the result: %0.2f" % clf.score(X_test, y_test))
+    print("Partitioning with 60/40 gave the result: %0.2f" % clf.score(X_test, y_test))
 
     classifier = SVC()
-    classifier.fit(features, labels)
+    classifier.fit(final_features, labels)
     #n_jobs = # of cpus, with 'cv' folds.
-    score = cross_val_score(classifier, features, labels, n_jobs = -1, cv=4)
-    print("With five folds cross validation found an accuracy of: %0.2f (+/- %0.2f)" % (score.mean(), score.std() * 2))
+    score = cross_val_score(classifier, final_features, labels, n_jobs = -1, cv=4)
+    print("With five folds cross validation found an accuracy of: %0.2f (+/- %0.2f)\n" % (score.mean(), score.std() * 2))
