@@ -3,11 +3,12 @@ import sys
 import time
 import json
 import re
+import os
 import datetime
 import nltk
 nltk.download('stopwords')
 from nltk.corpus import stopwords
-
+import sklearn
 
 def read_JSON_as_dict(file_name):
     #read the file in as a string and remove non-alphanumeric characters
@@ -70,20 +71,19 @@ def determine_if_popular(training_dict):
             else: comment["popular"] = False
     return training_dict
 
-def write_csv(file_name, training_dict):
-    headers = ['ups', 'popular', 'subreddit', 'body', 'controversiality', 'created_utc']
-    with open("training.csv", "wb") as file:
+def write_csv(file_name, training_list_of_comments):
+    headers = ['ups', 'popular', 'subreddit', 'body', 'controversiality', 'created_utc', 'distinguished']
+    with open(os.path.join('subreddit_csv', file_name), "wb") as file:
         w = csv.DictWriter(file, fieldnames=headers, extrasaction='ignore')
         w.writeheader()
-        for sub, list_of_comments in training_dict.iteritems():
-            for comment in list_of_comments:
-                w.writerow(comment)
+        for comment in training_list_of_comments:
+            w.writerow(comment)
         file.close()
 
 if __name__ == "__main__":
     print("Starting the timer.")
     start_time = time.time()
-    dict_of_subs = read_JSON_as_dict("tenThousand")
+    dict_of_subs = read_JSON_as_dict("ten")
     print("It took {0} to read the file.".format(time.time() - start_time))
     dict_of_subs_no_function_words = remove_function_words(dict_of_subs)
     #print("no funct:{0} ".format(dict_of_subs_no_function_words))
@@ -98,9 +98,8 @@ if __name__ == "__main__":
     testing_size = sum([len(v) for v in testing_dict.values()])
     training_size = sum([len(v) for v in training_dict.values()])
     print("Training size: {0}, testing size: {1}.".format(training_size, testing_size))
-    
+   
     training_dict_tagged = determine_if_popular(training_dict)
- 
-    #print(training_dict_tagged)
-    write_csv('training.csv', training_dict_tagged)
+    for k, v in training_dict_tagged.iteritems():
+        write_csv(str(k)+".csv", v)
     print("total time: {0}.".format(time.time() - start_time))

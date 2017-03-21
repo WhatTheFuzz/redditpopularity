@@ -17,12 +17,13 @@ if __name__ == "__main__":
     encoder = preprocessing.LabelEncoder()
     #init our vectorizer, which will transform our strings into a matrix
     cv = CountVectorizer()
-    list_to_vectorize = (list(set(data.body.tolist())))
+    #list_to_vectorize = (list(set(data.body.tolist())))
     
     #data.subreddit = encoder.fit_transform(data.subreddit)
     #subs = encoder.fit(data.subreddit)
     data.subreddit = encoder.fit_transform(data.subreddit.tolist())
     data.popular = encoder.fit_transform(data.popular.tolist())
+    #data.distinguished = encoder.fit_transform(data.popular.tolist())
     list_of_body = data.body.as_matrix()
     bag = cv.fit_transform(list_of_body)
     data.body = bag.toarray()
@@ -52,8 +53,8 @@ if __name__ == "__main__":
     binary_features = data[list(columns)].values
     wordfreq_features = bag.toarray()
     final_features = (np.hstack((binary_features, wordfreq_features)))
-    print "\nLabel length is: {0}. Feature length is: {1}".format(len(labels), (len(final_features)))
-    print "The features include: {}".format(columns)
+    print "\nLabel length is: {0}. Feature length is: {1}. These should match.".format(len(labels), (len(final_features)))
+    print "The features include: {}".format(", ".join(columns))
 
     #print "training labels: {0}".format(labels)
     #print "training features: {0}".format(features)
