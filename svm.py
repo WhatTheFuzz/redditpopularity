@@ -2,6 +2,8 @@ import sys
 import numpy as np
 from collections import defaultdict
 from sklearn.svm import SVC
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.naive_bayes import GaussianNB
 from sklearn.model_selection import cross_val_score
 from sklearn.model_selection import train_test_split
 from sklearn.feature_extraction.text import CountVectorizer
@@ -12,6 +14,14 @@ import os
 from os import listdir
 from os.path import isfile, join
 
+classifiers = [
+    SVC(kernel='linear', C=1),
+    DecisionTreeClassifier(criterion='entropy', max_depth=100, random_state=0),
+    GaussianNB()]
+names = [
+    "Linear SVM",
+    "Decision Tree",
+    "Naive Bayes"]
 #We need to get the number of lines in the file to ensure we have enough comments for our training set.
 #http://stackoverflow.com/questions/845058/how-to-get-line-count-cheaply-in-python
 def file_len(fname):
@@ -37,7 +47,7 @@ if __name__ == "__main__":
         #subs = encoder.fit(data.subreddit)
         data.subreddit = encoder.fit_transform(data.subreddit.tolist())
         data.popular = encoder.fit_transform(data.popular.tolist())
-        #data.distinguished = encoder.fit_transform(data.popular.tolist())
+        data.distinguished = encoder.fit_transform(data.popular.tolist())
         list_of_body = data.body.as_matrix()
         bag = cv.fit_transform(list_of_body)
         data.body = bag.toarray()
@@ -49,26 +59,28 @@ if __name__ == "__main__":
         print new_data
         '''
         #columns = features we want to fit. labels = what we want to predict
-        #columns= ["subreddit", "ups", "controversiality", "created_utc", "body"]
-        columns= ["subreddit", "created_utc", "controversiality"]
+        columns= ["ups", "controversiality", "created_utc", "body", "distinguished"]
         labels = data["popular"].values
         binary_features = data[list(columns)].values
         wordfreq_features = bag.toarray()
         final_features = (np.hstack((binary_features, wordfreq_features)))
-        print "Testing subreddit: {0}".format(f.replace(".csv", ""))
+        print "Testing subreddit: {0} with {1} comments.".format(f.replace(".csv", ""), file_len(join(sub_path, f)))
         #print "Label length is: {0}. Feature length is: {1}. These should match.".format(len(labels), (len(final_features)))
         #print "The features include: {}".format(", ".join(columns))
         
         #print "training labels: {0}".format(labels)
         #print "training features: {0}".format(features)
         
-        X_train, X_test, y_train, y_test = train_test_split(
-        final_features, labels, test_size=0.4, random_state=0)
-        clf = SVC(kernel='linear', C=1).fit(X_train, y_train)
-        print("Partitioning with 60/40 gave the result: %0.2f" % clf.score(X_test, y_test))
-        
-        classifier = SVC()
-        classifier.fit(final_features, labels)
-        #n_jobs = # of cpus, with 'cv' folds.
-        score = cross_val_score(classifier, final_features, labels, n_jobs = -1, cv=4)
-        print("With five folds cross validation found an accuracy of: %0.2f (+/- %0.2f)\n" % (score.mean(), score.std() * 2))
+        x_train, x_test, y_train, y_test = train_test_split(
+        final_features, labels, test_size=0.4, random_state=42)
+        for (name, clf) in zip(names,classifiers):
+            clf.fit(x_train, y_train)
+            print("{0} partitioning with 60/40 gave the result: %0.2f".format(name) % clf.score(x_test, y_test))
+            
+            #n_jobs = # of cpus, with 'cv' folds.
+            score = cross_val_score(clf, final_features, labels, n_jobs = -1, cv=4)
+            print("{0} with five folds cross validation found an accuracy of: %0.2f (+/- %0.2f)".format(name) % (score.mean(), score.std() * 2))
+        print("\n")
+
+
+
