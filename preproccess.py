@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 import csv
 import sys
 import time
@@ -9,6 +10,8 @@ import nltk
 nltk.download('stopwords')
 from nltk.corpus import stopwords
 import sklearn
+#from textblob.classifiers import NaiveBayesClassifier
+from textblob import classifiers
 
 def read_JSON_as_dict(file_name):
     #read the file in as a string and remove non-alphanumeric characters
@@ -28,9 +31,7 @@ def remove_function_words(dict_of_subs):
             comment["body"] = comment_list
             for word in comment_list:
                 dict_of_all_words[word] = dict_of_all_words.get(word, 0) + 1
-
-        for comment in list_of_comments:
-            comment["body"] = ([word for word in comment_list if word not in stopwords.words("english") if dict_of_all_words[word] >=2])
+            comment["body"] = ([word for word in comment_list if word not in stopwords.words("english")])
     return dict_of_subs
 
 def filter_votes_length(dict_of_subs):
@@ -61,30 +62,60 @@ def determine_if_popular(training_dict):
             sub_list.append(int(comment["ups"]))
         sorted_list = sorted(sub_list)
         dict_of_upvotes[sub] = int(sorted_list[(len(sorted_list)/4)*3])
-    print(dict_of_upvotes)
     for sub, list_of_comments in training_dict.iteritems():
         for comment in list_of_comments:
             comment["body"] = " ".join(comment["body"])
             comment["created_utc"] = datetime.datetime.fromtimestamp(int(comment["created_utc"])).strftime("%H")
+            comment["sentiment"] = str(sentiment_clf.classify(comment["body"]))
+            if comment["distinguished"]!="":
+                comment["distinguished"] = "not_distinguished"
             if (int(comment["ups"]) >= dict_of_upvotes[sub]): 
                 comment["popular"] = True
             else: comment["popular"] = False
     return training_dict
 
+def get_sentiment(training_dict):
+    for sub, list_of_comments in training_dict.iteritems():
+        for comment in list_of_comments:
+            comment["sentiment"] = 0
+
 def write_csv(file_name, training_list_of_comments):
-    headers = ['ups', 'popular', 'subreddit', 'body', 'controversiality', 'created_utc', 'distinguished']
-    with open(os.path.join('subreddit_csv', file_name), "wb") as file:
+    headers = ['ups', 'popular', 'subreddit', 'body', 'controversiality', 'created_utc', 'distinguished', 'sentiment']
+    with open(os.path.join('til_csv', file_name), "wb") as file:
         w = csv.DictWriter(file, fieldnames=headers, extrasaction='ignore')
         w.writeheader()
         for comment in training_list_of_comments:
             w.writerow(comment)
         file.close()
 
+lexicon = "lexicon.txt"
+lexicon_csv = csv.reader(open(lexicon, "rb"), delimiter=" ")
+sentiment_list = [(l[2].replace("word1=", ""), l[5].replace("priorpolarity=", "")) for l in lexicon_csv]
+
+print("training the sentiment classifier")
+clf_timer = time.time()
+sentiment_clf = classifiers.NaiveBayesClassifier(sentiment_list)
+print("It took {0}s to train the sentiement classifier".format(time.time() - clf_timer))
+
 if __name__ == "__main__":
     print("Starting the timer.")
     start_time = time.time()
-    dict_of_subs = read_JSON_as_dict("ten")
+    dict_of_subs = read_JSON_as_dict("til")
     print("It took {0} to read the file.".format(time.time() - start_time))
+    '''
+    for sub, list_of_comment_in_sub in dict_of_subs:
+        for comment in list_of_comments:
+            comment_list = wordList = re.sub("[^\w]", " ",  comment["body"]).split()
+            for word in comment_list:
+                dict_of_all_words[word] = dict_of_all_words.get(word, 0) + 1
+        for comment in list_of_comments:
+            comment["body"] = ([word for word in comment_list if word not in stopwords.words("english") if dict_of_all_words[word] >=2])
+
+    '''    
+
+
+
+
     dict_of_subs_no_function_words = remove_function_words(dict_of_subs)
     #print("no funct:{0} ".format(dict_of_subs_no_function_words))
     print("It took {0} to remove function words.".format(time.time() - start_time))
@@ -98,7 +129,6 @@ if __name__ == "__main__":
     testing_size = sum([len(v) for v in testing_dict.values()])
     training_size = sum([len(v) for v in training_dict.values()])
     print("Training size: {0}, testing size: {1}.".format(training_size, testing_size))
-   
     training_dict_tagged = determine_if_popular(training_dict)
     for k, v in training_dict_tagged.iteritems():
         write_csv(str(k)+".csv", v)
