@@ -6,7 +6,7 @@ Making Popular Comments on Reddit
 This project seeks to validate the results of previous authors' work, such as Tracy Rohlin's Master's Thesis for San Jose State in his work, ["Popularity Prediction of Reddit Texts."](http://scholarworks.sjsu.edu/etd_theses/4704/) As there are no courses at West Point dealing with machine learning, this project also introduces me to the field and will serve as my Honor's Theis. 
 
 ## Objective
-- With the input of any particular Reddit comment, determine if the comment is likely to be popular within that subreddit. Please not that this is different from post popularity. What I aim to uncover is whether replies to a post become popular by feeding off the context of the original post. If I obtain a high accuracy, my results would refute this hypothesis, as I never examine the context of the original post. This would mean that comments become popular because of some other featute. 
+- With the input of any particular Reddit comment, determine if the comment is likely to be popular within that subreddit. Please not that this is different from post popularity. What I aim to uncover is whether replies to a post become popular by feeding off the context of the original post. If I obtain a high accuracy, my results would refute this hypothesis, as I never examine the context of the original post. This would mean that comments become popular because of some other feature. 
 - Achieve >75% predcitability. 
 
 ## Data
@@ -23,8 +23,8 @@ A single comments looks like so:
 
 ## Usage
 - Clone this repository to a folder of your choosing.
-- exectue: ```python preprocess.py dir_to_reddit_comments```, depending on how large the comment file is, this may take a non-trivial amount of time (several hours). This is a one-time process, as it will write the data into another file, which we will then analyze.
-- once complete execute: ```python classifiers.py```. This will automatically look for the folder "subreddit_csv" and learn from it, eventually testing it against the test data and producing a result such as: ```Accuracy: 0.67 (+/- 0.07)``` (higher (~1) is better)
+- Exectue: ```python preprocess.py dir_to_reddit_comments```, depending on how large the comment file is, this may take a non-trivial amount of time (several hours). This is a one-time process, as it will write the data into another file, which we will then analyze.
+- Once complete execute: ```python classifiers.py```. This will automatically look for the folder "subreddit_csv" and learn from it, eventually testing it against the test data and producing a result such as: ```Accuracy: 0.67 (+/- 0.07)``` (higher (~1) is better)
 
 ## Misc.
 - In the preprocessing step, I opted for readability and compartmentalization over raw speed. Given that this only is run once before writing to a .csv, I felt it was worth the loss in speed. This is why you might notice that I loop through each comment multiple times. 

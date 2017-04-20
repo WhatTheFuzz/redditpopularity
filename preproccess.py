@@ -81,7 +81,7 @@ def get_sentiment(training_dict):
 
 def write_csv(file_name, training_list_of_comments):
     headers = ['ups', 'popular', 'subreddit', 'body', 'controversiality', 'created_utc', 'distinguished', 'sentiment']
-    with open(os.path.join('til_csv', file_name), "wb") as file:
+    with open(os.path.join('subreddit_twomillion_csv', file_name), "wb") as file:
         w = csv.DictWriter(file, fieldnames=headers, extrasaction='ignore')
         w.writeheader()
         for comment in training_list_of_comments:
@@ -99,37 +99,17 @@ print("It took {0}s to train the sentiement classifier".format(time.time() - clf
 
 if __name__ == "__main__":
     print("Starting the timer.")
+    file_name = str(sys.argv[1]) if len(sys.argv) > 1 else ("logs/RC_2015-01")
+    print file_name
     start_time = time.time()
-    dict_of_subs = read_JSON_as_dict("til")
+    dict_of_subs = read_JSON_as_dict(file_name)
     print("It took {0} to read the file.".format(time.time() - start_time))
-    '''
-    for sub, list_of_comment_in_sub in dict_of_subs:
-        for comment in list_of_comments:
-            comment_list = wordList = re.sub("[^\w]", " ",  comment["body"]).split()
-            for word in comment_list:
-                dict_of_all_words[word] = dict_of_all_words.get(word, 0) + 1
-        for comment in list_of_comments:
-            comment["body"] = ([word for word in comment_list if word not in stopwords.words("english") if dict_of_all_words[word] >=2])
-
-    '''    
-
-
-
 
     dict_of_subs_no_function_words = remove_function_words(dict_of_subs)
-    #print("no funct:{0} ".format(dict_of_subs_no_function_words))
-    print("It took {0} to remove function words.".format(time.time() - start_time))
     dict_of_subs_stripped = filter_votes_length(dict_of_subs_no_function_words)
-    #print "stripeed: {0}".format(dict_of_subs_stripped)
     dict_reduced = {k: v for k, v in dict_of_subs_stripped.items() if v}
-    #print "reduced: {0}".format(dict_reduced)
-    print("It took {0} to filter votes.".format(time.time() - start_time))
     
-    training_dict, testing_dict = split_training_test(dict_reduced)
-    testing_size = sum([len(v) for v in testing_dict.values()])
-    training_size = sum([len(v) for v in training_dict.values()])
-    print("Training size: {0}, testing size: {1}.".format(training_size, testing_size))
-    training_dict_tagged = determine_if_popular(training_dict)
-    for k, v in training_dict_tagged.iteritems():
+    dict_tagged = determine_if_popular(dict_reduced)
+    for k, v in dict_tagged.items():
         write_csv(str(k)+".csv", v)
     print("total time: {0}.".format(time.time() - start_time))

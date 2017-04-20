@@ -96,11 +96,12 @@ def merge_dicts(a, b):
     precedence goes to key value pairs in latter dicts.
     """
     result = {}
-    dict_a = json.loads(b)
-    return dict_a["subreddit"] 
+    sub = a[0]
+    dict = a[1]
+    return dict
  
 
-lexicon = "lexicon.txt"
+lexicon = "lexicon_test.txt"
 lexicon_csv = csv.reader(open(lexicon, "rb"), delimiter=" ")
 sentiment_list = [(l[2].replace("word1=", ""), l[5].replace("priorpolarity=", "")) for l in lexicon_csv]
 
@@ -119,11 +120,15 @@ if __name__ == "__main__":
     file.setName("Preproccessed_CSV")
 
     start_time = time.time()
-    dict = read_JSON_as_dict(file_name) 
+    dict = file.map(lambda line: (str(json.loads(line)["subreddit"]), json.loads(line))).collect()
+        #.map(lambda x: list(x[1])).collect()
+    
+    print(dict)
+    #dict = read_JSON_as_dict(file_name) 
         #.map(lambda dict: {dict["subreddit"]:list(dict)})\
         #.reduce(lambda a, b: a.setdefault(b.keys()[0], [])\
         #    .append(b[b.keys()[0]][0]))
-    #print type(dicts.take(10)[0])
+    #print(dict.take(10)[0][1].take(2))
     #dict_of_subs = file.reduce(lambda a, b: merge_dicts(a, b))
     '''
     dict_of_subs = read_JSON_as_dict(file_name)

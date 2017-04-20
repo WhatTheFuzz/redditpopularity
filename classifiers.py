@@ -12,11 +12,13 @@ from sklearn.feature_extraction.text import CountVectorizer
 from sklearn import neighbors, datasets, preprocessing
 from sklearn.cross_validation import train_test_split
 from sklearn.model_selection import cross_val_score
+from sklearn.model_selection import cross_val_predict
 from sklearn.metrics import accuracy_score
 
 from sklearn.svm import SVC
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.naive_bayes import GaussianNB
+from sklearn.metrics import cohen_kappa_score
 
 classifiers = [
     SVC(kernel='linear', C=1),
@@ -38,8 +40,8 @@ def file_len(fname):
 
 if __name__ == "__main__":
     #where all of the csvs are stored.
-    sub_path = "subreddit_csv"
-    files = [f for f in listdir(sub_path) if isfile(join(sub_path, f)) if file_len(join(sub_path, f))>750]
+    sub_path = "subreddit_twomillion_csv"
+    files = [f for f in listdir(sub_path) if isfile(join(sub_path, f)) if file_len(join(sub_path, f))>1750]
     for f in files:
         data = pandas.read_csv(os.path.join(sub_path, f))
 
@@ -59,18 +61,20 @@ if __name__ == "__main__":
         word_freq = bag.toarray()
         
         columns = ["distinguished", "sentiment", "created_utc", "controversiality"]
-        features = data[list(columns)].values
+        features = np.hstack((data[list(columns)].values, word_freq))
         labels = data.popular.values
 
         X_train, X_test, y_train, y_test = train_test_split(features, labels, random_state=random.randint(1,10000))
         scaler = preprocessing.StandardScaler().fit(X_train)
         X_train = scaler.transform(X_train)
         X_test = scaler.transform(X_test)
-        print "Testing subreddit: {0} with {1} comments.".format(f.replace(".csv", ""), file_len(join(sub_path, f)))
+        file = open("clf_results.dat","a+")
+        file.write("Testing subreddit: {0} with {1} comments.".format(f.replace(".csv", ""), file_len(join(sub_path, f))))
         for (name, clf) in zip(names, classifiers):
             clf.fit(X_train, y_train)
-            y_pred = clf.predict(X_test)
+            y_pred = cross_val_predict(clf, features, labels, n_jobs=-1, cv=10)
             
-            score = cross_val_score(clf, features, labels, n_jobs = -1, cv=4)
-            print("{0} with five folds cross validation found an accuracy of: %0.3f (+/- %0.2f)".format(name) % (score.mean(), score.std() * 2))
-        print "\n" 
+            score = cross_val_score(clf, features, labels, n_jobs=-1, cv=10)
+            file.write("{0} with five folds cross validation found an accuracy of: %0.3f (+/- %0.2f)".format(name) % (score.mean(), score.std() * 2))
+            file.write("Cohen Kappa Score: {}".format(cohen_kappa_score(y_pred, labels)))
+        file.write("\n") 
