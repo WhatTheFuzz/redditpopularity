@@ -61,7 +61,7 @@ def determine_if_popular(training_dict):
         for comment in list_of_comments:
             sub_list.append(int(comment["ups"]))
         sorted_list = sorted(sub_list)
-        dict_of_upvotes[sub] = int(sorted_list[(len(sorted_list)/4)*3])
+        dict_of_upvotes[sub] = int(sorted_list[(len(sorted_list)/2)])
     for sub, list_of_comments in training_dict.iteritems():
         for comment in list_of_comments:
             comment["body"] = " ".join(comment["body"])
@@ -81,7 +81,7 @@ def get_sentiment(training_dict):
 
 def write_csv(file_name, training_list_of_comments):
     headers = ['ups', 'popular', 'subreddit', 'body', 'controversiality', 'created_utc', 'distinguished', 'sentiment']
-    with open(os.path.join('subreddit_twomillion_csv', file_name), "wb") as file:
+    with open(os.path.join('subreddit_twomillion_50_csv', file_name), "wb") as file:
         w = csv.DictWriter(file, fieldnames=headers, extrasaction='ignore')
         w.writeheader()
         for comment in training_list_of_comments:

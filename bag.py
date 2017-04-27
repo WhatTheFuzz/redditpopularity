@@ -10,18 +10,21 @@ import copy
 from sklearn import neighbors, datasets, preprocessing
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.model_selection import train_test_split, cross_val_score, cross_val_predict
-from sklearn.metrics import accuracy_score, cohen_kappa_score, \
-                            precision_recall_curve, average_precision_score, recall_score
+from sklearn.metrics import accuracy_score, cohen_kappa_score
 
 from sklearn.svm import SVC
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.naive_bayes import GaussianNB
 
+from sklearn import tree
+from IPython.display import Image
+import pydotplus
+
 classifiers = [
     SVC(kernel='linear', C=1),
-    #must set max-depth or we run into memory errors.
     DecisionTreeClassifier(criterion='entropy', random_state=0),
     GaussianNB()]
+words_classifiers = copy.deepcopy(classifiers)
 names = [
     "Linear SVM",
     "Decision Tree",
@@ -44,39 +47,32 @@ if __name__ == "__main__":
 
         popular_encoder = preprocessing.LabelEncoder()
         data.popular = popular_encoder.fit_transform(data.popular.tolist())
-        #file.write("Popular encoder test: {0}".format(np.unique(popular_encoder.classes_) == [0, 1]))
-        
-        distinguished_encoder = preprocessing.LabelEncoder()
-        data.distinguished = distinguished_encoder.fit_transform(data.distinguished.tolist())
-        
-        sentiment_encoder = preprocessing.LabelEncoder()
-        data.sentiment = sentiment_encoder.fit_transform(data.sentiment.tolist())
         
         cv = CountVectorizer()
         list_of_body = data.body.as_matrix()
         bag = cv.fit_transform(list_of_body)
         word_freq = bag.toarray()
         
-        columns = ["distinguished", "sentiment", "created_utc", "controversiality"]
-        features = np.hstack((data[list(columns)].values, word_freq))
+        features =  word_freq
         labels = data.popular.values
 
         X_train, X_test, y_train, y_test = train_test_split(features, labels, random_state=random.randint(1,10000))
         scaler = preprocessing.StandardScaler().fit(X_train)
         X_train = scaler.transform(X_train)
         X_test = scaler.transform(X_test)
-        file = open("results/clf_results_1750.dat","a+")
-        file.write("\nTesting subreddit: {0} with {1} comments.\n".format(f.replace(".csv", ""), file_len(join(sub_path, f))))
+        file = open("results/bag.dat","a+")
+        print("Testing subreddit: {0} with {1} comments.\n".format(f.replace(".csv", ""), file_len(join(sub_path, f))))
         for (name, clf) in zip(names, classifiers):
             clf.fit(X_train, y_train)
             y_pred = cross_val_predict(clf, features, labels, n_jobs=-1, cv=10)
+            
             score = cross_val_score(clf, features, labels, n_jobs=-1, cv=10)
-
-            precision, recall, thresholds = precision_recall_curve(labels, y_pred)
-            acc_score = accuracy_score(labels, y_pred)
-            avg_precision = average_precision_score(labels, y_pred)
-            avg_recall = recall_score(labels, y_pred)
-
-            file.write("{0} with five folds cross validation found an accuracy of: %0.3f (+/- %0.2f)\n".format(name) % (score.mean(), score.std() * 2))
-            file.write("Cohen Kappa Score: %0.3f\n" % (cohen_kappa_score(y_pred, labels)))
-            file.write("Accuracy:%0.3f, Precision:%0.3f, Recall:%0.3f\n" % (acc_score, avg_precision, avg_recall))
+            if (name=="Decision Tree"):
+                dot_data = tree.export_graphviz(clf, out_file=None,
+                                                feature_names = map(lambda x: str(x), cv.get_feature_names()),
+                                                filled=True, rounded=True)
+                graph = pydotplus.graph_from_dot_data(dot_data)
+                graph.write_pdf("results/pdf/bag_{0}.pdf".format(f.replace(".csv", "")))
+            print("{0} with five folds cross validation found an accuracy of: %0.3f (+/- %0.2f)\n".format(name) % (score.mean(), score.std() * 2))
+            print("Cohen Kappa Score: %0.3f\n" % (cohen_kappa_score(y_pred, labels))) 
+        print("\n") 
