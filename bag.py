@@ -18,17 +18,14 @@ from sklearn.naive_bayes import GaussianNB
 
 from sklearn import tree
 from IPython.display import Image
+import graphviz
 import pydotplus
 
 classifiers = [
-    SVC(kernel='linear', C=1),
-    DecisionTreeClassifier(criterion='entropy', random_state=0),
-    GaussianNB()]
+    DecisionTreeClassifier(criterion='entropy', random_state=0)]
 words_classifiers = copy.deepcopy(classifiers)
 names = [
-    "Linear SVM",
-    "Decision Tree",
-    "Naive Bayes"]
+    "Decision Tree"]
 
 #We need to get the number of lines in the file to ensure we have enough comments for our training set.
 #http://stackoverflow.com/questions/845058/how-to-get-line-count-cheaply-in-python
@@ -70,7 +67,8 @@ if __name__ == "__main__":
             if (name=="Decision Tree"):
                 dot_data = tree.export_graphviz(clf, out_file=None,
                                                 feature_names = map(lambda x: str(x), cv.get_feature_names()),
-                                                filled=True, rounded=True)
+                                                filled=True, rounded=True,
+                                                special_characters=False)
                 graph = pydotplus.graph_from_dot_data(dot_data)
                 graph.write_pdf("results/pdf/bag_{0}.pdf".format(f.replace(".csv", "")))
             print("{0} with five folds cross validation found an accuracy of: %0.3f (+/- %0.2f)\n".format(name) % (score.mean(), score.std() * 2))

@@ -69,7 +69,7 @@ if __name__ == "__main__":
         file.write("\nTesting subreddit: {0} with {1} comments.\n".format(f.replace(".csv", ""), file_len(join(sub_path, f))))
         for (name, clf) in zip(names, classifiers):
             clf.fit(X_train, y_train)
-            y_pred = cross_val_predict(clf, features, labels, n_jobs=-1, cv=10)
+            y_pred = clf.predict(features)
             score = cross_val_score(clf, features, labels, n_jobs=-1, cv=10)
 
             precision, recall, thresholds = precision_recall_curve(labels, y_pred)
@@ -77,6 +77,6 @@ if __name__ == "__main__":
             avg_precision = average_precision_score(labels, y_pred)
             avg_recall = recall_score(labels, y_pred)
 
-            file.write("{0} with five folds cross validation found an accuracy of: %0.3f (+/- %0.2f)\n".format(name) % (score.mean(), score.std() * 2))
+            file.write("{0}:\nScore: %0.3f (+/- %0.2f)\n".format(name) % (score.mean(), score.std() * 2))
             file.write("Cohen Kappa Score: %0.3f\n" % (cohen_kappa_score(y_pred, labels)))
             file.write("Accuracy:%0.3f, Precision:%0.3f, Recall:%0.3f\n" % (acc_score, avg_precision, avg_recall))
