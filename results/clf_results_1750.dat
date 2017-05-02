@@ -81,3 +81,43 @@ Naive Bayes:
 Score: 0.515 (+/- 0.03)
 Cohen Kappa Score: 0.461
 Accuracy:0.821, Precision:0.755, Recall:0.386
+
+Testing subreddit: todayilearned with 2242 comments.
+Linear SVM:Score: 0.662 (+/- 0.05)
+Cohen Kappa: 0.000, Accuracy:0.745, Precision:0.628, Recall:0.000, F1:0.000
+Decision Tree:Score: 0.635 (+/- 0.06)
+Cohen Kappa: 0.012, Accuracy:0.645, Precision:0.342, Recall:0.220, F1:0.241
+Naive Bayes:Score: 0.680 (+/- 0.03)
+Cohen Kappa: 0.488, Accuracy:0.844, Precision:0.771, Recall:0.392, F1:0.562
+
+Testing subreddit: leagueoflegends with 1862 comments.
+Linear SVM:Score: 0.611 (+/- 0.06)
+Cohen Kappa: 0.000, Accuracy:0.699, Precision:0.650, Recall:0.000, F1:0.000
+Decision Tree:Score: 0.586 (+/- 0.07)
+Cohen Kappa: 0.043, Accuracy:0.645, Precision:0.395, Recall:0.204, F1:0.256
+Naive Bayes:Score: 0.602 (+/- 0.05)
+Cohen Kappa: 0.578, Accuracy:0.846, Precision:0.811, Recall:0.507, F1:0.665
+
+Testing subreddit: destinythegame with 1917 comments.
+Linear SVM:Score: 0.623 (+/- 0.06)
+Cohen Kappa: 0.000, Accuracy:0.707, Precision:0.646, Recall:0.000, F1:0.000
+Decision Tree:Score: 0.600 (+/- 0.07)
+Cohen Kappa: 0.024, Accuracy:0.692, Precision:0.351, Recall:0.068, F1:0.114
+Naive Bayes:Score: 0.565 (+/- 0.03)
+Cohen Kappa: 0.544, Accuracy:0.840, Precision:0.800, Recall:0.465, F1:0.630
+
+Testing subreddit: worldnews with 3031 comments.
+Linear SVM:Score: 0.641 (+/- 0.04)
+Cohen Kappa: 0.000, Accuracy:0.741, Precision:0.630, Recall:0.000, F1:0.000
+Decision Tree:Score: 0.617 (+/- 0.03)
+Cohen Kappa: 0.024, Accuracy:0.735, Precision:0.336, Recall:0.038, F1:0.070
+Naive Bayes:Score: 0.651 (+/- 0.05)
+Cohen Kappa: 0.379, Accuracy:0.816, Precision:0.726, Recall:0.296, F1:0.454
+
+Testing subreddit: news with 2058 comments.
+Linear SVM:Score: 0.635 (+/- 0.05)
+Cohen Kappa: 0.000, Accuracy:0.734, Precision:0.633, Recall:0.000, F1:0.000
+Decision Tree:Score: 0.625 (+/- 0.08)
+Cohen Kappa: 0.013, Accuracy:0.728, Precision:0.317, Recall:0.027, F1:0.051
+Naive Bayes:Score: 0.680 (+/- 0.05)
+Cohen Kappa: 0.422, Accuracy:0.822, Precision:0.750, Recall:0.335, F1:0.500
